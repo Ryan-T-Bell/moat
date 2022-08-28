@@ -1,55 +1,11 @@
 import yfinance as yf
 
-moat = ["K",
-"VEEV",
-"PII",
-"GILD",
-"ECL",
-"BLK",
-"BA",
-"TYL",
-"MSFT",
-"AMZN",
-"MMM",
-"BIIB",
-"EFX",
-"ETSY",
-"WFC",
-"MAS",
-"EMR",
-"ADBE",
-"ZBH",
-"MELI",
-"GOOGL",
-"LRCX",
-"WU",
-"CRM",
-"MDT",
-"GWRE",
-"NOW",
-"TER",
-"META",
-"INTC",
-"CPB",
-"MRK",
-"STZ",
-"CSGP",
-"PM",
-"ROK",
-"SCHW",
-"KLAC",
-"DIS",
-"ICE",
-"STT",
-"BLKB",
-"HON",
-"WDAY",
-"MCHP",
-"TRU",
-"BRK/B",
-"TROW",
-"CMCSA",
-"CMP"]
+moat = [ "K", "VEEV", "PII", "GILD", "ECL", "BLK", "BA","TYL","MSFT","AMZN","MMM","BIIB",
+        "EFX","ETSY","WFC","MAS","EMR","ADBE","ZBH","MELI","GOOGL", "LRCX","WU","CRM",
+        "MDT", "GWRE", "NOW", "TER", "META", "INTC", "CPB", "MRK", "STZ", "CSGP", "PM",
+        "ROK", "SCHW", "KLAC", "DIS", "ICE", "STT", "BLKB", "HON", "WDAY", "MCHP", "TRU",
+        "BRK/B", "TROW", "CMCSA","CMP"
+]
 
 
 def merge_dfs(df0, df1):
@@ -67,11 +23,16 @@ def get_ma_score(df):
                 return 1
         return 0
 
+def get_fundamentals(symbol):
+        ticker = yf.Ticker(symbol)
+        return [ str(ticker.info['forwardPE']) + ", " + 
+                str(ticker.info['priceToBook']) + ", " + 
+                str(ticker.info['returnOnEquity']) + ", " + 
+                str(ticker.info['debtToEquity']) + ", " + 
+                str(ticker.info['grossMargins']) + ", " + 
+                str(ticker.info['revenueGrowth'])
+        ]
+
 def main():
-        # Base Calculation
-        moat = yf.Ticker('MOAT').history()
-        xlre = yf.Ticker('XLRE').history()
-        gnr = yf.Ticker('GNR').history()
-        gbtc = yf.Ticker('GBTC').history()
-        gld = yf.Ticker('GLD').history()
+        print(get_fundamentals('BA'))
  

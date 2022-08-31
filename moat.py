@@ -1,7 +1,7 @@
 import yfinance as yf
 import pandas as pd
 
-watchlist = ['OXY', 'XOM', 'CVX', 'MU', 'TSM', 'NVDA', 'AAPL',
+watchlist = ['OXY', 'XOM', 'CVX', 'MU', 'TSM', 'NVDA', 'AAPL','TER','CSGP','INTC','MATX',
         # MOAT Stocks
         'K', 'VEEV', 'PII', 'GILD', 'ECL', 'BLK', 'BA','TYL','MSFT','AMZN','MMM','BIIB',
         'EFX','ETSY','WFC','MAS','EMR','ADBE','ZBH','MELI','GOOGL', 'LRCX','WU','CRM',
@@ -12,25 +12,25 @@ watchlist = ['OXY', 'XOM', 'CVX', 'MU', 'TSM', 'NVDA', 'AAPL',
 
 def get_fundamentals(symbol):
         ticker = yf.Ticker(symbol)
-        pe = score_forwardPE(ticker)
+        peg = score_peg(ticker)
         pb = score_priceToBook(ticker)
         roe = score_returnOnEquity(ticker)
         roa = score_returnOnAssets(ticker)
         de = score_debtToEquity(ticker)
-        return [symbol, pe, pb, roe, roa, de, pe+pb+roe+roa+de]
+        return [symbol, peg, pb, roe, roa, de, peg+pb+roe+roa+de]
 
-def score_forwardPE(ticker):
-        pe = ticker.info['forwardPE']
+def score_peg(ticker):
+        peg = ticker.info['pegRatio']
 
-        if pe == None or pe < 0 or pe >= 40:
+        if peg == None or peg < 0 or peg >= 4:
                 return 0
-        elif pe < 10:
+        elif peg < 1:
                 return 5
-        elif pe < 15:
+        elif peg < 1.5:
                 return 4
-        elif pe < 20:
+        elif peg < 2:
                 return 3
-        elif pe < 30:
+        elif peg < 4:
                 return 2
         return 1
 
@@ -95,24 +95,21 @@ def score_debtToEquity(ticker):
         return 1
 
 def main():
-        symbols, pe, pb, roe, roa, de, score = [], [], [], [], [], [], []
+        symbols, peg, pb, roe, roa, de, score = [], [], [], [], [], [], []
 
         for symbol in watchlist:
-                print('\n-------------------------')
-                print(symbol)
-                print('-------------------------')
                 ticker = yf.Ticker(symbol)
                 symbols.append(symbol)
-                pe.append(score_forwardPE(ticker))
+                peg.append(score_peg(ticker))
                 pb.append(score_priceToBook(ticker))
                 roe.append(score_returnOnEquity(ticker))
                 roa.append(score_returnOnAssets(ticker))
                 de.append(score_debtToEquity(ticker))
-                score.append(pe[-1] + pb[-1] + roe[-1] + roa[-1] + de[-1])
+                score.append(peg[-1] + pb[-1] + roe[-1] + roa[-1] + de[-1])
         
         dict = {
         'Symbol': symbols,
-        'Price to Earnings': pe,
+        'Price to Earnings': peg,
         'Price to Book': pb,
         'Return on Equity': roe,
         'Return on Assets': roa,

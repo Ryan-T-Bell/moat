@@ -1,13 +1,56 @@
 import yfinance as yf
 import pandas as pd
 
-watchlist = ['OXY', 'XOM', 'CVX', 'MU', 'TSM', 'NVDA', 'AAPL','TER','CSGP','INTC','MATX',
+watchlist = [
+        # My List
+        'MU','TSM','NVDA','AAPL','MATX','TENB','CRWD','TEAM','EGY',
+
+        # Oil
+        'OXY', 'XOM', 'CVX',
+
+        # Uranium / Nuclear Power
+        'UEC',
+
+        # Cybersecurity
+        'BAH','CRWD','PANW','CTXS','ZS','JNPR','CHKP','VMW','CACI','AKAM',
+        'FTNT','CYBR','MNDT','QLYS','SAIC','OKTA','DOCU','S','TENB',
+        'BB','CALX','ALRM','RPD','VRNS','MANT','PING','MCRO','NETC','DARK',
+        'TMV','EVBG','KNBE','YOU','ADTN','RDWR','ATEN','MYEG','ABST',
+        'KAPE','TLS','CGNT','OSPN','YSN','SPLK','DDOG','NET',
+
+        # DATORAMA
+        'GEO','CACC','IAC','RFP','ALLY','WFC',
+
         # MOAT Stocks
         'K', 'VEEV', 'PII', 'GILD', 'ECL', 'BLK', 'BA','TYL','MSFT','AMZN','MMM','BIIB',
         'EFX','ETSY','WFC','MAS','EMR','ADBE','ZBH','MELI','GOOGL', 'LRCX','WU','CRM',
         'MDT', 'GWRE', 'NOW', 'TER', 'META', 'INTC', 'CPB', 'MRK', 'STZ', 'CSGP', 'PM',
         'ROK', 'SCHW', 'KLAC', 'DIS', 'ICE', 'STT', 'BLKB', 'HON', 'WDAY', 'MCHP', 'TRU',
         'TROW', 'CMCSA','CMP'
+]
+
+commodities = [
+        # Oil
+        'OXY', 'XOM', 'CVX',
+
+        # Uranium / Nuclear Power
+        'UEC'
+]
+
+cyber_security = [
+        'BAH','CRWD','PANW','CTXS','ZS','JNPR','CHKP','VMW','CACI','AKAM',
+        'FTNT','CYBR','MNDT','QLYS','SAIC','OKTA','DOCU','S','TENB',
+        'BB','CALX','ALRM','RPD','VRNS','MANT','PING','MCRO','NETC','DARK',
+        'TMV','EVBG','KNBE','YOU','ADTN','RDWR','ATEN','MYEG','ABST',
+        'KAPE','TLS','CGNT','OSPN','YSN','SPLK','DDOG','NET'
+]
+
+moat = [
+        'K', 'VEEV', 'PII', 'GILD', 'ECL', 'BLK', 'BA','TYL','MSFT','AMZN','MMM','BIIB',
+        'EFX','ETSY','WFC','MAS','EMR','ADBE','ZBH','MELI','GOOGL', 'LRCX','WU','CRM',
+        'MDT', 'GWRE', 'NOW', 'TER', 'META', 'INTC', 'CPB', 'MRK', 'STZ', 'CSGP', 'PM',
+        'ROK', 'SCHW', 'KLAC', 'DIS', 'ICE', 'STT', 'BLKB', 'HON', 'WDAY', 'MCHP', 'TRU',
+        'TROW', 'CMCSA','CMP'      
 ]
 
 def get_fundamentals(symbol):
@@ -20,7 +63,10 @@ def get_fundamentals(symbol):
         return [symbol, peg, pb, roe, roa, de, peg+pb+roe+roa+de]
 
 def score_peg(ticker):
-        peg = ticker.info['pegRatio']
+        try:
+                peg = ticker.info['pegRatio']
+        except:
+                return 0
 
         if peg == None or peg < 0 or peg >= 4:
                 return 0
@@ -35,7 +81,10 @@ def score_peg(ticker):
         return 1
 
 def score_priceToBook(ticker):
-        pb = ticker.info['priceToBook']
+        try:
+                pb = ticker.info['priceToBook']
+        except:
+                return 0
 
         if pb == None or pb < 0 or pb >= 10:
                 return 0
@@ -48,9 +97,12 @@ def score_priceToBook(ticker):
         elif pb < 8:
                 return 2
         return 1
-        
+
 def score_returnOnEquity(ticker):
-        roe = ticker.info['returnOnEquity']
+        try:
+                roe = ticker.info['returnOnEquity']
+        except:
+                return 0
 
         if roe == None or roe < 0:
                 return 0
@@ -65,7 +117,10 @@ def score_returnOnEquity(ticker):
         return 1
 
 def score_returnOnAssets(ticker):
-        roa = ticker.info['returnOnAssets']
+        try:
+                roa = ticker.info['returnOnAssets']
+        except:
+                return 0
 
         if roa == None or roa < 0:
                 return 0
@@ -80,7 +135,10 @@ def score_returnOnAssets(ticker):
         return 1
 
 def score_debtToEquity(ticker):
-        de = ticker.info['debtToEquity']
+        try:
+                de = ticker.info['debtToEquity']
+        except:
+                return 0
 
         if de == None or de < 0 or de >= 30:
                 return 0
@@ -98,6 +156,7 @@ def main():
         symbols, peg, pb, roe, roa, de, score = [], [], [], [], [], [], []
 
         for symbol in watchlist:
+                print(symbol)
                 ticker = yf.Ticker(symbol)
                 symbols.append(symbol)
                 peg.append(score_peg(ticker))
@@ -117,8 +176,8 @@ def main():
         'Score': score
         }
 
-        df = pd.DataFrame(dict)
-        print(pd.DataFrame(dict).sort_values(by=['Score']))
+        df = pd.DataFrame(dict).sort_values(by=['Score'])
+        df.to_csv('results.csv', index = False)
         
 if __name__ == '__main__':
         main()
